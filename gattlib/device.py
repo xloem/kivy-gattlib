@@ -3,7 +3,7 @@ import logging
 from jnius import autoclass, cast, PythonJavaClass, java_method
 from concurrent.futures import Future
 
-from .gatt import GattService#, GattCharacteristic
+from .gatt import GattService, GattCharacteristic
 
 from .exception import *
 
@@ -87,9 +87,36 @@ class Device:
         # Discover GATT Characteristics
         #
         
+        self._characteristics = {}
         for service in self._services.values():
-            for characteristic in service.gattlib_primary_service.getCharacteristics():
-                print(characteristic.getUuid().toString())
+            for characteristic in service._gattlib_primary_service.getCharacteristics():
+                characteristic = GattCharacteristic(self, characteristic)
+                self._characteristics[characteristic.short_uuid] = characteristic
+
+                logging.debug('Characteristic UUID:0x%x' % characteristic.short_uuid)
+
+    @property
+    def services(self):
+        if not hasattr(self, '_services'):
+            logging.warning('Start GATT discovery implicitly')
+            self.discover()
+
+        return self._services
+
+    @property
+    def characteristics(self):
+        if not hasattr(self, '_characteristics'):
+            logging.warning('Start GATT discovery implicitly')
+            self.discover()
+
+        return self._characteristics
+
+    def __str__(self):
+        name = self._name
+        if name:
+            return str(name)
+        else:
+            return str(self._addr)
 
 #class PythonGattCallback(PythonJavaClass):
 #    __javainterfaces__ = ['android.bluetooth.BluetoothGattCallback']

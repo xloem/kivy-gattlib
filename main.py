@@ -16,19 +16,26 @@ class MyApp(App):
     def build(self):
         adapter = gattlib.adapter.Adapter()
         adapter.open()
-        scanned_device = None
+        scanned_devices = []
         def on_scan(device, userdata):
             nonlocal scanned_device
             print(device)
-            scanned_device = device
-        adapter.scan_enable(on_scan, 10)
-        if scanned_device is None:
+            scanned_devices.append(device)
+        adapter.scan_enable(on_scan, 5)
+        if len(scanned_devices) == 0:
             print('no devices found yet')
             return Label(text = 'no devices found yet')
-        scanned_device.connect()
-        scanned_device.discover()
-        print('services', scanned_device.services)
-        return Label(text = 'services\b' + '\n'.join(str(service.uuid) for service in scanned_device.services.values()))
+        summary = ''
+        for scanned_device in scanned_devices:
+            summary += str(scanned_device) + ':\n'
+            scanned_device.connect()
+            scanned_device.discover()
+            for service in scanned_device.services.values():
+                summary += '  service ' + str(service.uuid) + '\n'
+            for characteristic in scanned_device.characteristics.values():
+                summary += '  characteristic ' + str(characteristic.uuid) + '\n'
+            print(summary)
+        return Label(text = summary, font_size='10sp')
 
 
 if __name__ == '__main__':
