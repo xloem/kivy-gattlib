@@ -1,11 +1,11 @@
 [app]
-title = App
-package.name = test 
-package.domain = xloem.github.com3
+title = Kivy Gattlib Demo
+package.name = kivygattlibdemo
+package.domain = xloem.github.com
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1.7
-requirements = kivy,python3
+requirements = kivy,python3,gattlib-py
 orientation = portrait
 osx.python_version = 3
 osx.kivy_version = 1.9.1
@@ -19,6 +19,7 @@ ios.ios_deploy_url = https://github.com/phonegap/ios-deploy
 ios.ios_deploy_branch = 1.7.0
 #p4a.fork = xloem
 p4a.branch = develop
+p4a.local_recipes = recipes
 
 [buildozer]
 log_level = 2
